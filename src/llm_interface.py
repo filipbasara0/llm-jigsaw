@@ -180,20 +180,40 @@ class AnthropicProvider(LLMProvider):
 
 
 class GoogleProvider(LLMProvider):
-    """Google Gemini API provider."""
+    """Google Gemini API provider (Gemini 3, etc.)."""
 
-    def __init__(self, model: str, api_key: str):
+    # Use high resolution for best image analysis (1120 tokens per image)
+    MEDIA_RESOLUTION = "media_resolution_high"
+
+    def __init__(self, model: str, api_key: str, thinking_level: str = "low"):
+        """
+        Initialize the Google Gemini provider.
+
+        Args:
+            model: Model name (e.g., 'gemini-3-pro-preview', 'gemini-3-flash-preview')
+            api_key: Google API key
+            thinking_level: Thinking level for Gemini 3 models ('low', 'high').
+                Mapped from reasoning_effort: none/low -> 'low', medium/high -> 'high'
+        """
         self.model = model
         self.api_key = api_key
+        self.thinking_level = thinking_level
         self._client = None
 
     def _get_client(self):
         if self._client is None:
             from google import genai
 
-            # genai.configure(api_key=self.api_key)
-            self._client = genai.Client()
+            # Use v1alpha API version for media_resolution support
+            self._client = genai.Client(http_options={"api_version": "v1alpha"})
         return self._client
+
+    def _encode_image(self, image: np.ndarray) -> bytes:
+        """Encode image to bytes."""
+        pil_image = Image.fromarray(image)
+        buffer = BytesIO()
+        pil_image.save(buffer, format="PNG")
+        return buffer.getvalue()
 
     def request(
         self,
@@ -201,18 +221,40 @@ class GoogleProvider(LLMProvider):
         user_prompt: str,
         images: list[np.ndarray],
     ) -> tuple[str, dict]:
+        from google.genai import types
+
         client = self._get_client()
 
-        # Build content
-        content = []
+        # Build content parts with high media_resolution for images
+        parts = []
         for img in images:
-            pil_image = Image.fromarray(img)
-            content.append(pil_image)
-        content.append(f"{system_prompt}\n\n{user_prompt}")
+            image_bytes = self._encode_image(img)
+            parts.append(
+                types.Part(
+                    inline_data=types.Blob(
+                        mime_type="image/png",
+                        data=image_bytes,
+                    ),
+                    media_resolution={"level": self.MEDIA_RESOLUTION},
+                )
+            )
+        parts.append(types.Part(text=f"{system_prompt}\n\n{user_prompt}"))
 
-        response = client.models.generate_content(model=self.model, contents=content)
+        # Build content
+        content = types.Content(parts=parts)
 
-        # Gemini doesn't always provide detailed usage
+        # Configure thinking level for Gemini 3
+        config = types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_level=self.thinking_level)
+        )
+
+        response = client.models.generate_content(
+            model=self.model,
+            contents=content,
+            config=config,
+        )
+
+        # Extract usage metadata
         usage = {
             "prompt_tokens": getattr(response.usage_metadata, "prompt_token_count", 0)
             if hasattr(response, "usage_metadata")
@@ -226,6 +268,15 @@ class GoogleProvider(LLMProvider):
         }
 
         return response.text, usage
+
+
+# Map reasoning_effort to Gemini thinking_level
+_REASONING_TO_THINKING = {
+    "none": "low",
+    "low": "low",
+    "medium": "high",
+    "high": "high",
+}
 
 
 def get_provider(
@@ -243,7 +294,7 @@ def get_provider(
         model: Model name
         api_key: API key
         base_url: Optional base URL override (for OpenAI-compatible APIs)
-        reasoning_effort: Reasoning effort level for OpenAI ('none', 'low', 'medium', 'high')
+        reasoning_effort: Reasoning effort level ('none', 'low', 'medium', 'high')
     """
     provider = provider.lower()
 
@@ -252,7 +303,8 @@ def get_provider(
     elif provider == "anthropic":
         return AnthropicProvider(model, api_key)
     elif provider == "google":
-        return GoogleProvider(model, api_key)
+        thinking_level = _REASONING_TO_THINKING.get(reasoning_effort, "low")
+        return GoogleProvider(model, api_key, thinking_level)
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -276,7 +328,8 @@ class LLMInterface:
             model: Model name
             api_key: API key
             base_url: Optional base URL for OpenAI-compatible APIs
-            reasoning_effort: Reasoning effort level for OpenAI ('none', 'low', 'medium', 'high')
+            reasoning_effort: Reasoning effort level ('none', 'low', 'medium', 'high').
+                For Google, this maps to thinking_level: none/low -> 'low', medium/high -> 'high'
         """
         self.provider_name = provider
         self.model = model

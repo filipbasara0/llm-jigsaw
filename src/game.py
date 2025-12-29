@@ -40,7 +40,7 @@ class GameConfig:
     model: str = "gpt-5.2"
     api_key: str = ""
     base_url: Optional[str] = None
-    reasoning_effort: str = "none"  # "none", "low", "medium", "high" for OpenAI reasoning models
+    reasoning_effort: str = "none"  # "none", "low", "medium", "high" for reasoning models
 
     # Game limits
     max_moves_per_turn: int = 16
