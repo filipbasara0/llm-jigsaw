@@ -48,7 +48,7 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your-key-here"
 
 # Run a simple puzzle
-python main.py --image images/sample.jpg --grid-size 4 --model gpt-5.2
+python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model gpt-5.2 --show-correct-count
 ```
 
 ## Usage
@@ -117,8 +117,10 @@ python main.py --image <path> --grid-size <n> [options]
 ```bash
 python main.py \
   --image images/landscape.jpg \
-  --grid-size 4 \
+  --resize 512 \
+  --grid-size 3 \
   --model gpt-5.2 \
+  --show-correct-count \
   --seed 42
 ```
 
@@ -126,7 +128,9 @@ python main.py \
 ```bash
 python main.py \
   --image images/panorama.jpg \
+  --resize 512 \
   --grid-size 3x5 \
+  --show-correct-count \
   --model gpt-5.2
 ```
 
@@ -134,7 +138,8 @@ python main.py \
 ```bash
 python main.py \
   --image images/artwork.jpg \
-  --grid-size 8 \
+  --resize 512 \
+  --grid-size 4 \
   --provider anthropic \
   --model claude-4-5-sonnet \
   --show-correct-count \
@@ -145,9 +150,11 @@ python main.py \
 ```bash
 python main.py \
   --image images/photo.jpg \
-  --grid-size 16 \
+  --resize 512 \
+  --grid-size 5 \
   --model gpt-5.2 \
   --save-images \
+  --show-correct-count \
   --output results/hard_run/
 ```
 
@@ -169,7 +176,7 @@ The LLM responds with JSON specifying swaps:
 
 - Format: `"row,col"` (1-indexed)
 - Origin: Top-left is `"1,1"`
-- Example for 8×8: Top-left `"1,1"`, bottom-right `"8,8"`
+- Example for 4×4: Top-left `"1,1"`, bottom-right `"4,4"`
 
 ## Output
 
