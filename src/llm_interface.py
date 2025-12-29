@@ -39,7 +39,7 @@ class LLMProvider(ABC):
 
 
 class OpenAIProvider(LLMProvider):
-    """OpenAI API provider (GPT-4o, etc.)."""
+    """OpenAI API provider (gpt-5.2, etc.)."""
 
     def __init__(
         self,

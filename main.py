@@ -91,22 +91,22 @@ def main():
         epilog="""
 Examples:
   # Basic run with 4x4 grid
-  python main.py --image puzzle.jpg --grid-size 4 --model gpt-4o
+  python main.py --image puzzle.jpg --grid-size 4 --model gpt-5.2
 
   # Rectangular 3x5 grid (3 rows, 5 columns)
-  python main.py --image puzzle.jpg --grid-size 3x5 --model gpt-4o
+  python main.py --image puzzle.jpg --grid-size 3x5 --model gpt-5.2
 
   # Use Claude with hints enabled
   python main.py --image puzzle.jpg --grid-size 4 \\
-    --provider anthropic --model claude-3-5-sonnet-20241022 \\
+    --provider anthropic --model claude-4-5-sonnet \\
     --show-correct-count
 
   # Full options with 6x8 grid
   python main.py --image puzzle.jpg --grid-size 6x8 \\
-    --provider openai --model gpt-4o \\
+    --provider openai --model gpt-5.2 \\
     --max-moves-per-turn 16 --max-turns 50 \\
     --annotation-mode both --colored-borders \\
-    --show-correct-count --show-reference \\
+    --show-correct-count \\
     --seed 42 --output results/run1/
         """,
     )
@@ -134,7 +134,7 @@ Examples:
         help="LLM provider (default: openai)",
     )
     parser.add_argument(
-        "--model", "-m", type=str, default="gpt-4o", help="Model name (default: gpt-4o)"
+        "--model", "-m", type=str, default="gpt-5.2", help="Model name (default: gpt-5.2)"
     )
     parser.add_argument(
         "--api-key", type=str, default=None, help="API key (or set via environment variable)"
@@ -184,7 +184,7 @@ Examples:
         "--show-correct-count", action="store_true", help="Show how many pieces are correct"
     )
     parser.add_argument(
-        "--show-reference", action="store_true", help="Provide the original image as reference"
+        "--no-reference", action="store_true", help="Don't provide the original image as reference"
     )
     parser.add_argument(
         "--annotate-reference",
@@ -258,7 +258,7 @@ Examples:
         annotation_mode=args.annotation_mode,
         colored_borders=args.colored_borders,
         show_correct_count=args.show_correct_count,
-        show_reference_image=args.show_reference,
+        show_reference_image=not args.no_reference,
         annotate_reference_image=args.annotate_reference,
         include_move_history=not args.no_history,
         output_dir=output_dir,

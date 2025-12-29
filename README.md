@@ -2,6 +2,11 @@
 
 A benchmark for testing multimodal LLM spatial reasoning capabilities through iterative jigsaw puzzle solving.
 
+<p align="center">
+  <img src="docs/reference.png" alt="Reference Image" width="400"/>
+  <img src="docs/game_evolution.gif" alt="Solving Process" width="400"/>
+</p>
+
 ## Overview
 
 This project shuffles an image into an N×N grid and challenges an LLM to restore the original image by iteratively swapping pieces. The task tests:
@@ -13,12 +18,13 @@ This project shuffles an image into an N×N grid and challenges an LLM to restor
 
 ## Features
 
-- **Configurable difficulty**: Grid sizes from 4×4 (easy) to 32×32 (hard)
+- **Configurable difficulty**: Square (4×4) or rectangular (3×5) grids
 - **Multiple LLM providers**: OpenAI, Anthropic, Google
 - **Visual annotations**: Grid labels, colored borders for easy piece identification
 - **Comprehensive metrics**: Tracks moves, accuracy, tokens, timing
 - **Reproducible**: Seed-based shuffling for consistent benchmarks
 - **Optional hints**: Show correct count, provide reference image
+- **Animated GIF output**: Visualize the solving process
 
 ## Installation
 
@@ -42,7 +48,7 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your-key-here"
 
 # Run a simple puzzle
-python main.py --image images/sample.jpg --grid-size 4 --model gpt-4o
+python main.py --image images/sample.jpg --grid-size 4 --model gpt-5.2
 ```
 
 ## Usage
@@ -58,38 +64,41 @@ python main.py --image <path> --grid-size <n> [options]
 | Argument | Description |
 |----------|-------------|
 | `--image`, `-i` | Path to the puzzle image |
-| `--grid-size`, `-g` | Grid size (2, 4, 8, 16, or 32) |
+| `--grid-size`, `-g` | Grid size: single number for square (e.g., `4`) or `NxM` for rectangular (e.g., `3x5`) |
 
 ### LLM Options
 
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `--provider`, `-p` | openai | LLM provider (openai, anthropic, google) |
-| `--model`, `-m` | gpt-4o | Model name |
+| `--model`, `-m` | gpt-5.2 | Model name |
 | `--api-key` | env var | API key (or use environment variable) |
 | `--base-url` | None | Custom base URL for OpenAI-compatible APIs |
+| `--reasoning-effort` | none | Reasoning effort for OpenAI reasoning models (none, low, medium, high) |
 
 ### Game Options
 
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `--max-moves-per-turn` | 16 | Maximum swaps per turn |
-| `--max-turns` | 100 | Maximum number of turns |
+| `--max-turns` | 50 | Maximum number of turns |
 | `--seed` | None | Random seed for reproducible shuffling |
+| `--resize` | None | Resize image so shorter side equals this value (e.g., 512, 1024) |
 
 ### Annotation Options
 
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `--annotation-mode` | both | Label style (border_labels, cell_labels, both) |
-| `--no-colored-borders` | False | Disable colored cell borders |
+| `--colored-borders` | False | Enable colored cell borders |
 
 ### Hint Options
 
 | Argument | Description |
 |----------|-------------|
 | `--show-correct-count` | Show how many pieces are correctly placed |
-| `--show-reference` | Provide the solved image as reference |
+| `--no-reference` | Don't provide the solved image as reference (shown by default) |
+| `--annotate-reference` | Add grid lines/coordinates to the reference image |
 | `--no-history` | Don't include move history in prompts |
 
 ### Output Options
@@ -98,17 +107,27 @@ python main.py --image <path> --grid-size <n> [options]
 |----------|---------|-------------|
 | `--output`, `-o` | auto-generated | Output directory for results |
 | `--save-images` | False | Save intermediate puzzle states |
+| `--no-gif` | False | Don't save an animated GIF |
+| `--gif-duration` | 500 | Duration of each frame in the GIF (ms) |
 | `--quiet`, `-q` | False | Suppress progress output |
 
 ## Examples
 
-### Easy Puzzle with GPT-4o
+### Easy Puzzle with gpt-5.2
 ```bash
 python main.py \
   --image images/landscape.jpg \
   --grid-size 4 \
-  --model gpt-4o \
+  --model gpt-5.2 \
   --seed 42
+```
+
+### Rectangular Grid (3 rows × 5 columns)
+```bash
+python main.py \
+  --image images/panorama.jpg \
+  --grid-size 3x5 \
+  --model gpt-5.2
 ```
 
 ### Medium Puzzle with Claude, Hints Enabled
@@ -117,7 +136,7 @@ python main.py \
   --image images/artwork.jpg \
   --grid-size 8 \
   --provider anthropic \
-  --model claude-3-5-sonnet-20241022 \
+  --model claude-4-5-sonnet \
   --show-correct-count \
   --max-turns 50
 ```
@@ -127,7 +146,7 @@ python main.py \
 python main.py \
   --image images/photo.jpg \
   --grid-size 16 \
-  --model gpt-4o \
+  --model gpt-5.2 \
   --save-images \
   --output results/hard_run/
 ```
@@ -161,6 +180,7 @@ results/run_name/
 ├── result.json       # Complete metrics and move history
 ├── initial_state.png # Shuffled puzzle at start
 ├── final_state.png   # Puzzle state at end
+├── game.gif          # Animated solving process
 ├── reference.png     # Original image (if --show-reference)
 └── turn_*.png        # Intermediate states (if --save-images)
 ```
@@ -219,17 +239,12 @@ llm-jigsaw/
 ## Tips for Best Results
 
 1. **Image Selection**: Choose images with clear structure and distinct regions
-2. **Start Small**: Begin with 4×4 to verify setup, then increase difficulty
+2. **Start Small**: Begin with 3×3 to verify setup, then increase difficulty
 3. **Use Seeds**: Set `--seed` for reproducible experiments
 4. **Enable History**: Move history helps the model avoid repeating mistakes
-5. **Try Hints**: `--show-correct-count` can help struggling models
-
-## Recommended Test Images
-
-- **Landscapes**: Clear horizon lines and distinct sky/ground
-- **Architecture**: Strong geometric patterns
-- **Artwork**: Paintings with clear composition
-- **Avoid**: Uniform textures (sky-only, walls), very busy patterns
+5. **Try Hints**: `--show-correct-count` can help struggling models (games usually wont converge without showing correct count)
+6. **Resize Images**: Use eg. `--resize 512` to reduce token usage and speed up API calls
+7. **Use Reasoning**: For grids larger than 3×3, enable `--reasoning-effort low` or `medium/high` for better results
 
 ## License
 
