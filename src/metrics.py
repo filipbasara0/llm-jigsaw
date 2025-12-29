@@ -10,7 +10,7 @@ from pathlib import Path
 @dataclass
 class TurnResult:
     """Result of a single puzzle-solving turn."""
-    
+
     turn_number: int
     moves_requested: list[tuple[str, str]]  # Moves the LLM requested
     moves_applied: list[tuple[str, str]]  # Moves actually applied (valid ones)
@@ -21,22 +21,22 @@ class TurnResult:
     raw_response: Optional[str] = None
     usage: dict = field(default_factory=dict)
     error: Optional[str] = None
-    
+
     @property
     def moves_successful(self) -> int:
         """Number of moves successfully applied."""
         return len(self.moves_applied)
-    
+
     @property
     def moves_failed(self) -> int:
         """Number of moves that failed."""
         return len(self.moves_invalid)
-    
+
     @property
     def progress(self) -> int:
         """Net change in correct pieces."""
         return self.correct_after - self.correct_before
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
@@ -55,65 +55,65 @@ class TurnResult:
 @dataclass
 class GameResult:
     """Complete result of a puzzle game."""
-    
+
     # Configuration
     image_path: str
     grid_size: int
     max_moves_per_turn: int
     max_turns: int
     shuffle_seed: Optional[int]
-    
+
     # LLM info
     provider: str
     model: str
-    
+
     # Settings
     annotation_mode: str
     colored_borders: bool
     show_correct_count: bool
     show_reference_image: bool
     include_move_history: bool
-    
+
     # Results
     solved: bool
     total_turns: int
     solve_turn: Optional[int]  # Turn when solved, if applicable
-    
+
     # Metrics
     total_moves: int
     total_invalid_moves: int
     max_correct_achieved: int
     final_correct: int
     total_pieces: int
-    
+
     # Token usage
     total_prompt_tokens: int
     total_completion_tokens: int
     total_tokens: int
-    
+
     # Timing
     start_time: str
     end_time: str
     duration_seconds: float
-    
+
     # History
     turn_history: list[TurnResult] = field(default_factory=list)
-    
+
     @property
     def accuracy(self) -> float:
         """Final accuracy as percentage."""
         return (self.final_correct / self.total_pieces) * 100 if self.total_pieces > 0 else 0
-    
+
     @property
     def max_accuracy(self) -> float:
         """Maximum accuracy achieved as percentage."""
         return (self.max_correct_achieved / self.total_pieces) * 100 if self.total_pieces > 0 else 0
-    
+
     @property
     def moves_per_turn(self) -> float:
         """Average moves per turn."""
         return self.total_moves / self.total_turns if self.total_turns > 0 else 0
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
@@ -155,14 +155,14 @@ class GameResult:
             },
             "turn_history": [t.to_dict() for t in self.turn_history],
         }
-    
+
     def save(self, path: str | Path) -> None:
         """Save result to JSON file."""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w") as f:
             json.dump(self.to_dict(), f, indent=2)
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> "GameResult":
         """Load from dictionary."""
@@ -170,7 +170,7 @@ class GameResult:
         results = data["results"]
         usage = data["usage"]
         timing = data["timing"]
-        
+
         turn_history = [
             TurnResult(
                 turn_number=t["turn_number"],
@@ -185,7 +185,7 @@ class GameResult:
             )
             for t in data.get("turn_history", [])
         ]
-        
+
         return cls(
             image_path=config["image_path"],
             grid_size=config["grid_size"],
@@ -215,7 +215,7 @@ class GameResult:
             duration_seconds=timing["duration_seconds"],
             turn_history=turn_history,
         )
-    
+
     @classmethod
     def load(cls, path: str | Path) -> "GameResult":
         """Load from JSON file."""
@@ -226,7 +226,7 @@ class GameResult:
 
 class MetricsTracker:
     """Tracks metrics during a game."""
-    
+
     def __init__(self, total_pieces: int):
         self.total_pieces = total_pieces
         self.turns: list[TurnResult] = []
@@ -235,26 +235,26 @@ class MetricsTracker:
         self.total_invalid_moves = 0
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
-    
+
     def record_turn(self, turn_result: TurnResult) -> None:
         """Record a turn result."""
         self.turns.append(turn_result)
         self.total_moves += turn_result.moves_successful
         self.total_invalid_moves += turn_result.moves_failed
         self.max_correct = max(self.max_correct, turn_result.correct_after)
-        
+
         usage = turn_result.usage
         self.total_prompt_tokens += usage.get("prompt_tokens", 0)
         self.total_completion_tokens += usage.get("completion_tokens", 0)
-    
+
     @property
     def total_tokens(self) -> int:
         return self.total_prompt_tokens + self.total_completion_tokens
-    
+
     def get_correct_progression(self) -> list[int]:
         """Get list of correct counts after each turn."""
         return [t.correct_after for t in self.turns]
-    
+
     def get_summary(self) -> dict:
         """Get a summary of current metrics."""
         return {
