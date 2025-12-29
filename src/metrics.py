@@ -1,7 +1,7 @@
 """Metrics and result tracking for puzzle games."""
 
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from typing import Optional
 from datetime import datetime
 import json
 from pathlib import Path

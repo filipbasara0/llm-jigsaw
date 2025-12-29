@@ -32,7 +32,7 @@ Focus on:
 If the puzzle appears solved, respond with an empty moves array."""
 
 
-USER_PROMPT_TEMPLATE = """Here is the current state of the {grid_size}×{grid_size} puzzle.
+USER_PROMPT_TEMPLATE = """Here is the current state of the {grid_description} puzzle.
 
 {history_section}
 {hints_section}
@@ -46,11 +46,11 @@ def build_system_prompt(
 ) -> str:
     """
     Build the system prompt for the LLM.
-    
+
     Args:
         coordinate_description: Description of the coordinate system
         max_moves: Maximum moves allowed per turn
-        
+
     Returns:
         Formatted system prompt
     """
@@ -61,7 +61,8 @@ def build_system_prompt(
 
 
 def build_user_prompt(
-    grid_size: int,
+    grid_rows: int,
+    grid_cols: int,
     move_history: Optional[list[dict]] = None,
     show_correct_count: bool = False,
     correct_count: Optional[int] = None,
@@ -70,48 +71,55 @@ def build_user_prompt(
 ) -> str:
     """
     Build the user prompt for the LLM.
-    
+
     Args:
-        grid_size: Size of the puzzle grid
+        grid_rows: Number of rows in the puzzle grid
+        grid_cols: Number of columns in the puzzle grid
         move_history: List of previous turns with moves
         show_correct_count: Whether to show how many pieces are correct
         correct_count: Number of correctly placed pieces
         total_pieces: Total number of pieces
         has_reference_image: Whether a reference image is provided
-        
+
     Returns:
         Formatted user prompt
     """
+    # Create grid description
+    if grid_rows == grid_cols:
+        grid_description = f"{grid_rows}×{grid_cols}"
+    else:
+        grid_description = f"{grid_rows}×{grid_cols} (rows×columns)"
+
     # Build history section
     history_section = ""
     if move_history:
         history_lines = ["**Previous Moves:**"]
         for i, turn in enumerate(move_history, 1):
-            moves_str = ", ".join(
-                f"{a} <-> {b}" for a, b in turn.get("moves", [])
-            )
+            moves_str = ", ".join(f"{a} <-> {b}" for a, b in turn.get("moves", []))
             if moves_str:
                 line = f"Turn {i}: {moves_str}"
                 if "correct_after" in turn:
                     line += f" (pieces correct after: {turn['correct_after']})"
                 history_lines.append(line)
         history_section = "\n".join(history_lines) + "\n"
-    
+
     # Build hints section
     hints_section = ""
     hints = []
-    
+
     if show_correct_count and correct_count is not None:
-        hints.append(f"Currently {correct_count}/{total_pieces} pieces are in the correct position.")
-    
+        hints.append(
+            f"Currently {correct_count}/{total_pieces} pieces are in the correct position."
+        )
+
     if has_reference_image:
         hints.append("A reference image of the solved puzzle is provided as the second image.")
-    
+
     if hints:
         hints_section = "**Hints:**\n" + "\n".join(f"- {h}" for h in hints) + "\n"
-    
+
     return USER_PROMPT_TEMPLATE.format(
-        grid_size=grid_size,
+        grid_description=grid_description,
         history_section=history_section,
         hints_section=hints_section,
     )
@@ -124,12 +132,12 @@ def format_move_history_entry(
 ) -> dict:
     """
     Format a move history entry.
-    
+
     Args:
         turn_number: The turn number
         moves: List of (coord_a, coord_b) swaps made
         correct_after: Number of correct pieces after the turn
-        
+
     Returns:
         Dict with turn information
     """
