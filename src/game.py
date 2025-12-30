@@ -1,7 +1,7 @@
 """Main game controller for the jigsaw puzzle solver."""
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Literal, Optional
@@ -52,12 +52,12 @@ class GameConfig:
     colored_borders: bool = False
 
     # Hint settings
-    show_correct_count: bool = False
+    show_correct_count: bool = True
     show_reference_image: bool = False
     annotate_reference_image: bool = (
         False  # If True, reference image includes grid lines/coordinates
     )
-    include_move_history: bool = True
+    include_move_history: bool = False
 
     # Output settings
     output_dir: Optional[str] = None

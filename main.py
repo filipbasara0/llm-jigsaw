@@ -96,17 +96,15 @@ Examples:
   # Rectangular 3x5 grid (3 rows, 5 columns)
   python main.py --image puzzle.jpg --grid-size 3x5 --model gpt-5.2
 
-  # Use Claude with hints enabled
+  # Use Gemini with hints enabled
   python main.py --image puzzle.jpg --grid-size 4 \\
-    --provider anthropic --model claude-4-5-sonnet \\
-    --show-correct-count
+    --provider google --model gemini-3-pro-preview
 
-  # Full options with 6x8 grid
+  # Example with 6x8 grid
   python main.py --image puzzle.jpg --grid-size 6x8 \\
     --provider openai --model gpt-5.2 \\
     --max-moves-per-turn 16 --max-turns 50 \\
     --annotation-mode both --colored-borders \\
-    --show-correct-count \\
     --seed 42 --output results/run1/
         """,
     )
@@ -147,7 +145,7 @@ Examples:
         type=str,
         default="none",
         choices=["none", "low", "medium", "high"],
-        help="Reasoning effort for OpenAI reasoning models (default: none)",
+        help="Reasoning effort for reasoning models (default: none)",
     )
 
     # Game limits
@@ -181,7 +179,7 @@ Examples:
 
     # Hint settings
     parser.add_argument(
-        "--show-correct-count", action="store_true", help="Show how many pieces are correct"
+        "--no-correct-count", action="store_true", help="Don't show how many pieces are correct"
     )
     parser.add_argument(
         "--no-reference", action="store_true", help="Don't provide the original image as reference"
@@ -192,7 +190,7 @@ Examples:
         help="Add grid lines/coordinates to the reference image (makes puzzle easier)",
     )
     parser.add_argument(
-        "--no-history", action="store_true", help="Don't include move history in prompts"
+        "--show-move-history", action="store_true", help="Include move history in prompts"
     )
 
     # Output settings
@@ -257,10 +255,10 @@ Examples:
         shuffle_seed=args.seed,
         annotation_mode=args.annotation_mode,
         colored_borders=args.colored_borders,
-        show_correct_count=args.show_correct_count,
+        show_correct_count=not args.no_correct_count,
         show_reference_image=not args.no_reference,
         annotate_reference_image=args.annotate_reference,
-        include_move_history=not args.no_history,
+        include_move_history=args.show_move_history,
         output_dir=output_dir,
         save_intermediate_images=args.save_images,
         save_gif=not args.no_gif,

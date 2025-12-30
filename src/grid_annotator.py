@@ -2,7 +2,7 @@
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from typing import Literal, Optional
+from typing import Literal
 import colorsys
 
 

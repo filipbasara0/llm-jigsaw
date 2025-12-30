@@ -48,7 +48,7 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your-key-here"
 
 # Run a simple puzzle
-python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model gpt-5.2 --show-correct-count
+python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model gpt-5.2
 ```
 
 ## Usage
@@ -96,10 +96,10 @@ python main.py --image <path> --grid-size <n> [options]
 
 | Argument | Description |
 |----------|-------------|
-| `--show-correct-count` | Show how many pieces are correctly placed |
+| `--no-correct-count` | Don't show how many pieces are correctly placed (shown by default) |
 | `--no-reference` | Don't provide the solved image as reference (shown by default) |
 | `--annotate-reference` | Add grid lines/coordinates to the reference image |
-| `--no-history` | Don't include move history in prompts |
+| `--show-move-history` | Include move history in prompts (off by default) |
 
 ### Output Options
 
@@ -120,7 +120,6 @@ python main.py \
   --resize 512 \
   --grid-size 3 \
   --model gpt-5.2 \
-  --show-correct-count \
   --seed 42
 ```
 
@@ -130,7 +129,6 @@ python main.py \
   --image images/panorama.jpg \
   --resize 512 \
   --grid-size 3x5 \
-  --show-correct-count \
   --model gpt-5.2
 ```
 
@@ -142,7 +140,6 @@ python main.py \
   --grid-size 4 \
   --provider anthropic \
   --model claude-4-5-sonnet \
-  --show-correct-count \
   --max-turns 50
 ```
 
@@ -154,7 +151,6 @@ python main.py \
   --grid-size 5 \
   --model gpt-5.2 \
   --save-images \
-  --show-correct-count \
   --output results/hard_run/
 ```
 
@@ -245,13 +241,11 @@ llm-jigsaw/
 
 ## Tips for Best Results
 
-1. **Image Selection**: Choose images with clear structure and distinct regions
-2. **Start Small**: Begin with 3×3 to verify setup, then increase difficulty
-3. **Use Seeds**: Set `--seed` for reproducible experiments
-4. **Enable History**: Move history helps the model avoid repeating mistakes
-5. **Try Hints**: `--show-correct-count` can help struggling models (games usually wont converge without showing correct count)
-6. **Resize Images**: Use eg. `--resize 512` to reduce token usage and speed up API calls
-7. **Use Reasoning**: For grids larger than 3×3, enable `--reasoning-effort low` or `medium/high` for better results
+1. **Start Small**: Begin with 3×3 to verify setup, then increase difficulty
+2. **Use Seeds**: Set `--seed` for reproducible experiments
+3. **Correct Count**: Correct count is shown by default; this helps models converge
+4. **Resize Images**: Use eg. `--resize 512` to reduce token usage and speed up API calls
+5. **Use Reasoning**: For grids larger than 3×3, enable `--reasoning-effort low` or `medium/high` for better results
 
 ## License
 

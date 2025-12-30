@@ -23,16 +23,12 @@ SYSTEM_PROMPT_TEMPLATE = """You are an expert puzzle solver. Your task is to sol
   ]
 }}
 ```
-
-Focus on:
-1. Identifying pieces that are clearly out of place
-2. Finding where those pieces should go based on visual continuity
-3. Making swaps that move pieces closer to their correct positions
-
-If the puzzle appears solved, respond with an empty moves array."""
-
+"""
 
 USER_PROMPT_TEMPLATE = """Here is the current state of the {grid_description} puzzle.
+
+**Input Image:**
+The attached image shows the puzzle grid with {grid_description} pieces. Each piece is in a cell of the grid, and pieces may be in incorrect positions. Your goal is to identify which pieces are misplaced and swap them to restore the original image.
 
 {history_section}
 {hints_section}
@@ -108,8 +104,10 @@ def build_user_prompt(
     hints = []
 
     if show_correct_count and correct_count is not None:
+        incorrect_count = total_pieces - correct_count
         hints.append(
-            f"Currently {correct_count}/{total_pieces} pieces are in the correct position."
+            f"Currently {correct_count}/{total_pieces} pieces are in the correct position. "
+            f"There are still {incorrect_count} pieces that need to be swapped, provide moves to fix them."
         )
 
     if has_reference_image:
