@@ -21,6 +21,35 @@ def setup_logging(verbose: bool) -> None:
     )
 
 
+def parse_model_string(model_string: str) -> tuple[str, str]:
+    """
+    Parse model string in provider/model-name format.
+    
+    Args:
+        model_string: String in format "provider/model-name"
+        
+    Returns:
+        Tuple of (provider, model_name)
+    """
+    if "/" not in model_string:
+        raise argparse.ArgumentTypeError(
+            f"Invalid model format: {model_string}. Use 'provider/model-name' format "
+            "(e.g., 'openai/gpt-5.2', 'google/gemini-3-pro-preview', 'anthropic/claude-opus-4-5')"
+        )
+    
+    parts = model_string.split("/", 1)
+    provider = parts[0].lower()
+    model_name = parts[1]
+    
+    valid_providers = ["openai", "anthropic", "google"]
+    if provider not in valid_providers:
+        raise argparse.ArgumentTypeError(
+            f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}"
+        )
+    
+    return provider, model_name
+
+
 def get_api_key(provider: str, api_key: str | None) -> str:
     """Get API key from argument or environment."""
     if api_key:
@@ -90,19 +119,21 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Basic run with 4x4 grid
-  python main.py --image puzzle.jpg --grid-size 4 --model gpt-5.2
+  # Basic run with 4x4 grid using OpenAI
+  python main.py --image puzzle.jpg --grid-size 4 --model openai/gpt-5.2
 
   # Rectangular 3x5 grid (3 rows, 5 columns)
-  python main.py --image puzzle.jpg --grid-size 3x5 --model gpt-5.2
+  python main.py --image puzzle.jpg --grid-size 3x5 --model openai/gpt-5.2
 
-  # Use Gemini with hints enabled
-  python main.py --image puzzle.jpg --grid-size 4 \\
-    --provider google --model gemini-3-pro-preview
+  # Use Gemini
+  python main.py --image puzzle.jpg --grid-size 4 --model google/gemini-3-pro-preview
+
+  # Use Anthropic Claude
+  python main.py --image puzzle.jpg --grid-size 4 --model anthropic/claude-opus-4-5
 
   # Example with 6x8 grid
   python main.py --image puzzle.jpg --grid-size 6x8 \\
-    --provider openai --model gpt-5.2 \\
+    --model openai/gpt-5.2 \\
     --max-moves-per-turn 16 --max-turns 50 \\
     --annotation-mode both --colored-borders \\
     --seed 42 --output results/run1/
@@ -124,15 +155,11 @@ Examples:
 
     # LLM settings
     parser.add_argument(
-        "--provider",
-        "-p",
+        "--model",
+        "-m",
         type=str,
-        default="openai",
-        choices=["openai", "anthropic", "google"],
-        help="LLM provider (default: openai)",
-    )
-    parser.add_argument(
-        "--model", "-m", type=str, default="gpt-5.2", help="Model name (default: gpt-5.2)"
+        required=True,
+        help="Model in provider/model-name format (e.g., 'openai/gpt-5.2', 'google/gemini-3-pro-preview', 'anthropic/claude-opus-4-5')",
     )
     parser.add_argument(
         "--api-key", type=str, default=None, help="API key (or set via environment variable)"
@@ -217,6 +244,13 @@ Examples:
     setup_logging(not args.quiet)
     logger = logging.getLogger(__name__)
 
+    # Parse model string to get provider and model name
+    try:
+        provider, model_name = parse_model_string(args.model)
+    except argparse.ArgumentTypeError as e:
+        logger.error(str(e))
+        sys.exit(1)
+
     # Validate image path
     image_path = Path(args.image)
     if not image_path.exists():
@@ -225,7 +259,7 @@ Examples:
 
     # Get API key
     try:
-        api_key = get_api_key(args.provider, args.api_key)
+        api_key = get_api_key(provider, args.api_key)
     except ValueError as e:
         logger.error(str(e))
         sys.exit(1)
@@ -238,15 +272,15 @@ Examples:
             grid_str = f"{args.grid_size[0]}x{args.grid_size[1]}"
         else:
             grid_str = f"{args.grid_size}x{args.grid_size}"
-        output_dir = f"results/{args.model}_{grid_str}_{timestamp}"
+        output_dir = f"results/{model_name}_{grid_str}_{timestamp}"
 
     # Create config
     config = GameConfig(
         image_path=str(image_path),
         grid_size=args.grid_size,
         resize_to=args.resize,
-        provider=args.provider,
-        model=args.model,
+        provider=provider,
+        model=model_name,
         api_key=api_key,
         base_url=args.base_url,
         reasoning_effort=args.reasoning_effort,

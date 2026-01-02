@@ -64,6 +64,7 @@ def build_user_prompt(
     correct_count: Optional[int] = None,
     total_pieces: Optional[int] = None,
     has_reference_image: bool = False,
+    max_history_turns: int = 1,
 ) -> str:
     """
     Build the user prompt for the LLM.
@@ -76,6 +77,7 @@ def build_user_prompt(
         correct_count: Number of correctly placed pieces
         total_pieces: Total number of pieces
         has_reference_image: Whether a reference image is provided
+        max_history_turns: Maximum number of recent turns to show in detail
 
     Returns:
         Formatted user prompt
@@ -89,14 +91,54 @@ def build_user_prompt(
     # Build history section
     history_section = ""
     if move_history:
-        history_lines = ["**Previous Moves:**"]
-        for i, turn in enumerate(move_history, 1):
-            moves_str = ", ".join(f"{a} <-> {b}" for a, b in turn.get("moves", []))
-            if moves_str:
-                line = f"Turn {i}: {moves_str}"
-                if "correct_after" in turn:
-                    line += f" (pieces correct after: {turn['correct_after']})"
-                history_lines.append(line)
+        total_turns = len(move_history)
+        recent_history = move_history[-max_history_turns:]
+        start_turn = total_turns - len(recent_history) + 1
+
+        history_lines = [f"**Progress (Turn {total_turns}):**"]
+
+        # Add summary if we have enough history
+        if total_turns >= 2:
+            # Calculate progress trend
+            scores = [
+                t.get("correct_after") for t in move_history if t.get("correct_after") is not None
+            ]
+            if len(scores) >= 2:
+                recent_change = scores[-1] - scores[-2]
+                if recent_change > 0:
+                    trend = f"📈 Last move improved by {recent_change} piece(s)"
+                elif recent_change < 0:
+                    trend = f"📉 Last move went backwards by {abs(recent_change)} piece(s) — reconsider your approach"
+                else:
+                    trend = "➡️ No change from last move — try a different strategy"
+                history_lines.append(trend)
+
+                if total_turns > max_history_turns:
+                    history_lines.append(
+                        f"(Overall: started at {scores[0]}, now at {scores[-1]} correct pieces)"
+                    )
+
+        # Show recent moves
+        history_lines.append("")
+        history_lines.append(f"**Recent Moves (last {len(recent_history)} turns):**")
+        for i, turn in enumerate(recent_history):
+            turn_num = start_turn + i
+            moves = turn.get("moves", [])
+            num_moves = len(moves)
+            correct_str = f" → {turn['correct_after']} correct" if "correct_after" in turn else ""
+
+            if num_moves == 0:
+                continue
+            elif num_moves <= 3:
+                # Compact format for few moves
+                moves_str = " | ".join(f"{a} <-> {b}" for a, b in moves)
+                history_lines.append(f"  Turn {turn_num}: {moves_str}{correct_str}")
+            else:
+                # Multi-line format for many moves
+                history_lines.append(f"  Turn {turn_num} ({num_moves} swaps){correct_str}:")
+                for a, b in moves:
+                    history_lines.append(f"    • {a} <-> {b}")
+
         history_section = "\n".join(history_lines) + "\n"
 
     # Build hints section

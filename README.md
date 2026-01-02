@@ -48,8 +48,16 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your-key-here"
 
 # Run a simple puzzle
-python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model gpt-5.2
+python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model openai/gpt-5.2
 ```
+
+## Tips for Best Results
+
+1. **Start Small**: Begin with 3×3 to verify setup, then increase difficulty
+2. **Use Seeds**: Set `--seed` for reproducible experiments
+3. **Correct Count**: Correct count is shown by default; this helps models converge
+4. **Resize Images**: Use eg. `--resize 512` to reduce token usage and speed up API calls
+5. **Use Reasoning**: For grids larger than 3×3, enable `--reasoning-effort low` or `medium/high` for better results
 
 ## Usage
 
@@ -70,8 +78,7 @@ python main.py --image <path> --grid-size <n> [options]
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--provider`, `-p` | openai | LLM provider (openai, anthropic, google) |
-| `--model`, `-m` | gpt-5.2 | Model name |
+| `--model`, `-m` | (required) | Model in `provider/model-name` format (e.g., `openai/gpt-5.2`, `google/gemini-3-pro-preview`, `anthropic/claude-opus-4-5`) |
 | `--api-key` | env var | API key (or use environment variable) |
 | `--base-url` | None | Custom base URL for OpenAI-compatible APIs |
 | `--reasoning-effort` | none | Reasoning effort for OpenAI reasoning models (none, low, medium, high) |
@@ -113,13 +120,13 @@ python main.py --image <path> --grid-size <n> [options]
 
 ## Examples
 
-### Easy Puzzle with gpt-5.2
+### Easy Puzzle with GPT-5.2
 ```bash
 python main.py \
   --image images/landscape.jpg \
   --resize 512 \
   --grid-size 3 \
-  --model gpt-5.2 \
+  --model openai/gpt-5.2 \
   --seed 42
 ```
 
@@ -129,17 +136,16 @@ python main.py \
   --image images/panorama.jpg \
   --resize 512 \
   --grid-size 3x5 \
-  --model gpt-5.2
+  --model openai/gpt-5.2
 ```
 
-### Medium Puzzle with Claude, Hints Enabled
+### Medium Puzzle with Claude
 ```bash
 python main.py \
   --image images/artwork.jpg \
   --resize 512 \
   --grid-size 4 \
-  --provider anthropic \
-  --model claude-4-5-sonnet \
+  --model anthropic/claude-opus-4-5 \
   --max-turns 50
 ```
 
@@ -149,7 +155,7 @@ python main.py \
   --image images/photo.jpg \
   --resize 512 \
   --grid-size 5 \
-  --model gpt-5.2 \
+  --model openai/gpt-5.2 \
   --save-images \
   --output results/hard_run/
 ```
@@ -238,14 +244,6 @@ llm-jigsaw/
 ├── requirements.txt
 └── README.md
 ```
-
-## Tips for Best Results
-
-1. **Start Small**: Begin with 3×3 to verify setup, then increase difficulty
-2. **Use Seeds**: Set `--seed` for reproducible experiments
-3. **Correct Count**: Correct count is shown by default; this helps models converge
-4. **Resize Images**: Use eg. `--resize 512` to reduce token usage and speed up API calls
-5. **Use Reasoning**: For grids larger than 3×3, enable `--reasoning-effort low` or `medium/high` for better results
 
 ## License
 
