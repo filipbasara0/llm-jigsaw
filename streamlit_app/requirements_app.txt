@@ -1,0 +1,9 @@
+# Streamlit app dependencies
+# Run with: pip install -r requirements_app.txt
+
+# Core dependencies (from main project)
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# Streamlit
+streamlit>=1.30.0

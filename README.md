@@ -120,6 +120,9 @@ llm-jigsaw/
 │   ├── llm_interface.py      # LLM API abstraction
 │   ├── game.py               # Game controller
 │   └── prompts.py            # Prompt templates
+├── streamlit_app/            # Human player web app
+│   ├── app.py                # Streamlit app
+│   └── requirements_app.txt  # App dependencies
 ├── docs/                     # Documentation
 │   ├── RESULTS.md            # Benchmark results
 │   └── USAGE.md              # Full usage guide
