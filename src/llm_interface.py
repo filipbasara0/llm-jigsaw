@@ -117,12 +117,36 @@ class OpenAIProvider(LLMProvider):
         return output_text, usage
 
 
+# Map reasoning_effort to Anthropic effort levels
+# 'none' means no effort parameter (default behavior)
+_REASONING_TO_ANTHROPIC_EFFORT = {
+    "none": None,
+    "low": "low",
+    "medium": "medium",
+    "high": "high",
+}
+
+
 class AnthropicProvider(LLMProvider):
     """Anthropic API provider (Claude, etc.)."""
 
-    def __init__(self, model: str, api_key: str):
+    # Beta header required for effort parameter
+    EFFORT_BETA = "effort-2025-11-24"
+
+    def __init__(self, model: str, api_key: str, reasoning_effort: str = "none"):
+        """
+        Initialize the Anthropic provider.
+
+        Args:
+            model: Model name (e.g., 'claude-opus-4-5-20251101')
+            api_key: Anthropic API key
+            reasoning_effort: Effort level ('none', 'low', 'medium', 'high').
+                'none' uses default behavior, others use the effort beta API.
+                Note: effort parameter is only supported by Claude Opus 4.5.
+        """
         self.model = model
         self.api_key = api_key
+        self.reasoning_effort = _REASONING_TO_ANTHROPIC_EFFORT.get(reasoning_effort)
         self._client = None
 
     def _get_client(self):
@@ -163,12 +187,21 @@ class AnthropicProvider(LLMProvider):
             )
         content.append({"type": "text", "text": user_prompt})
 
-        response = client.messages.create(
-            model=self.model,
-            max_tokens=4096,
-            system=system_prompt,
-            messages=[{"role": "user", "content": content}],
-        )
+        # Build request kwargs
+        request_kwargs = {
+            "model": self.model,
+            "max_tokens": 16384,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": content}],
+        }
+
+        # Use beta API with effort parameter if specified
+        if self.reasoning_effort is not None:
+            request_kwargs["betas"] = [self.EFFORT_BETA]
+            request_kwargs["output_config"] = {"effort": self.reasoning_effort}
+            response = client.beta.messages.create(**request_kwargs)
+        else:
+            response = client.messages.create(**request_kwargs)
 
         usage = {
             "prompt_tokens": response.usage.input_tokens,
@@ -301,7 +334,7 @@ def get_provider(
     if provider == "openai":
         return OpenAIProvider(model, api_key, base_url, reasoning_effort)
     elif provider == "anthropic":
-        return AnthropicProvider(model, api_key)
+        return AnthropicProvider(model, api_key, reasoning_effort)
     elif provider == "google":
         thinking_level = _REASONING_TO_THINKING.get(reasoning_effort, "low")
         return GoogleProvider(model, api_key, thinking_level)

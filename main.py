@@ -24,10 +24,10 @@ def setup_logging(verbose: bool) -> None:
 def parse_model_string(model_string: str) -> tuple[str, str]:
     """
     Parse model string in provider/model-name format.
-    
+
     Args:
         model_string: String in format "provider/model-name"
-        
+
     Returns:
         Tuple of (provider, model_name)
     """
@@ -36,17 +36,17 @@ def parse_model_string(model_string: str) -> tuple[str, str]:
             f"Invalid model format: {model_string}. Use 'provider/model-name' format "
             "(e.g., 'openai/gpt-5.2', 'google/gemini-3-pro-preview', 'anthropic/claude-opus-4-5')"
         )
-    
+
     parts = model_string.split("/", 1)
     provider = parts[0].lower()
     model_name = parts[1]
-    
+
     valid_providers = ["openai", "anthropic", "google"]
     if provider not in valid_providers:
         raise argparse.ArgumentTypeError(
             f"Invalid provider: {provider}. Must be one of: {', '.join(valid_providers)}"
         )
-    
+
     return provider, model_name
 
 

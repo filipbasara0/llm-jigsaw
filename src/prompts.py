@@ -5,6 +5,13 @@ from typing import Optional
 
 SYSTEM_PROMPT_TEMPLATE = """You are an expert puzzle solver. Your task is to solve a jigsaw puzzle by identifying misplaced pieces and swapping them to restore the original image.
 
+**Iterative Approach:**
+This puzzle is solved step-by-step over multiple turns. You do NOT need to solve it all at once!
+- Focus on making steady progress each turn
+- Analyze the current state carefully before making moves
+- After each turn, you will see the updated puzzle state and can refine your approach
+- Aim to get the puzzle into a better shape with each turn
+
 **Coordinate System:**
 {coordinate_description}
 
@@ -26,14 +33,14 @@ SYSTEM_PROMPT_TEMPLATE = """You are an expert puzzle solver. Your task is to sol
 """
 
 USER_PROMPT_TEMPLATE = """Here is the current state of the {grid_description} puzzle.
-
+{turn_info}
 **Input Image:**
 The attached image shows the puzzle grid with {grid_description} pieces. Each piece is in a cell of the grid, and pieces may be in incorrect positions. Your goal is to identify which pieces are misplaced and swap them to restore the original image.
 
 {history_section}
 {hints_section}
 
-Analyze the image and provide your next moves to solve the puzzle."""
+Analyze the image carefully and provide your next moves. Remember: you have multiple turns to solve this puzzle, so focus on making confident improvements this turn rather than trying to solve everything at once."""
 
 
 def build_system_prompt(
@@ -64,7 +71,9 @@ def build_user_prompt(
     correct_count: Optional[int] = None,
     total_pieces: Optional[int] = None,
     has_reference_image: bool = False,
-    max_history_turns: int = 1,
+    max_history_turns: int = 2,
+    current_turn: Optional[int] = None,
+    max_turns: Optional[int] = None,
 ) -> str:
     """
     Build the user prompt for the LLM.
@@ -78,6 +87,8 @@ def build_user_prompt(
         total_pieces: Total number of pieces
         has_reference_image: Whether a reference image is provided
         max_history_turns: Maximum number of recent turns to show in detail
+        current_turn: Current turn number (1-indexed)
+        max_turns: Maximum number of turns allowed
 
     Returns:
         Formatted user prompt
@@ -87,6 +98,12 @@ def build_user_prompt(
         grid_description = f"{grid_rows}×{grid_cols}"
     else:
         grid_description = f"{grid_rows}×{grid_cols} (rows×columns)"
+
+    # Build turn info
+    turn_info = ""
+    if current_turn is not None and max_turns is not None:
+        turns_remaining = max_turns - current_turn
+        turn_info = f"\n**Turn {current_turn} of {max_turns}** ({turns_remaining} turn{'s' if turns_remaining != 1 else ''} remaining)\n"
 
     # Build history section
     history_section = ""
@@ -160,6 +177,7 @@ def build_user_prompt(
 
     return USER_PROMPT_TEMPLATE.format(
         grid_description=grid_description,
+        turn_info=turn_info,
         history_section=history_section,
         hints_section=hints_section,
     )

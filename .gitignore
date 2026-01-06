@@ -39,5 +39,9 @@ ENV/
 # Results (optional - uncomment if you want to ignore)
 results/
 
+# Benchmark results
+benchmark_*/
+
 # __pycache__ directories
 __pycache__/
+plots/
