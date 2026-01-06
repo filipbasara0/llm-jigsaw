@@ -82,7 +82,23 @@ export ANTHROPIC_API_KEY="your-key-here"
 python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model openai/gpt-5.2
 ```
 
-📖 **[Full usage guide & CLI reference](docs/USAGE.md)**
+📖 **[Full CLI reference](docs/USAGE.md)** · **[Benchmark guide](docs/BENCHMARK.md)**
+
+## Running Benchmarks
+
+Test multiple models across many images:
+
+```bash
+python benchmark.py \
+  --models openai/gpt-5.2 google/gemini-3-pro-preview \
+  --image-folder images \
+  --grid-size 4 \
+  --reasoning-effort low \
+  --resize 768 \
+  --parallel
+```
+
+📊 **[Full benchmark guide](docs/BENCHMARK.md)**
 
 ## How It Works
 
@@ -117,6 +133,7 @@ results/run_name/
 ```
 llm-jigsaw/
 ├── src/                      # Core library
+│   ├── benchmark/            # Benchmark framework
 │   ├── image_processor.py    # Image slicing and state management
 │   ├── grid_annotator.py     # Visual annotations
 │   ├── llm_interface.py      # LLM API abstraction
@@ -127,7 +144,8 @@ llm-jigsaw/
 │   └── requirements_app.txt  # App dependencies
 ├── docs/                     # Documentation
 │   ├── RESULTS.md            # Benchmark results
-│   └── USAGE.md              # Full usage guide
+│   ├── BENCHMARK.md          # Benchmark guide
+│   └── USAGE.md              # CLI usage guide
 ├── tests/                    # Test suite
 ├── images/                   # Test images
 ├── main.py                   # CLI entry point

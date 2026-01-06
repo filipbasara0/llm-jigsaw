@@ -1,4 +1,8 @@
-# Installation & Usage Guide
+# CLI Usage Guide
+
+Run a single puzzle solving session with an LLM.
+
+> **Running full benchmark (multiple evaluations)?** See the [Benchmark Guide](BENCHMARK.md).
 
 ## Installation
 
@@ -180,35 +184,7 @@ results/run_name/
 ## Running Tests
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=src --cov-report=html
-
-# Run specific test file
-pytest tests/test_image_processor.py -v
-```
-
-## Project Structure
-
-```
-llm-jigsaw/
-├── src/
-│   ├── __init__.py
-│   ├── image_processor.py   # Image slicing and state management
-│   ├── grid_annotator.py    # Visual annotations
-│   ├── llm_interface.py     # LLM API abstraction
-│   ├── game.py              # Game controller
-│   ├── metrics.py           # Result tracking
-│   └── prompts.py           # Prompt templates
-├── tests/
-│   ├── test_image_processor.py
-│   ├── test_grid_annotator.py
-│   └── test_game.py
-├── images/                   # Test images
-├── results/                  # Output directory
-├── main.py                   # CLI entry point
-├── requirements.txt
-└── README.md
+pytest                    # Run all tests
+pytest --cov=src          # With coverage
+pytest tests/test_*.py -v # Verbose
 ```
