@@ -9,7 +9,7 @@ A benchmark for testing multimodal LLM spatial reasoning capabilities through it
 
 ## 🏆 Benchmark Results
 
-**Can frontier LLMs solve jigsaw puzzles?** We tested GPT-5.2, Gemini 3 Pro, and Claude Opus 4.5 across grid sizes from 3×3 to 5×5.
+**Can frontier LLMs solve jigsaw puzzles?** We tested GPT-5.2, Gemini 3 Pro, and Claude Opus 4.5 across grid sizes from 3×3 to 5×5 on 20 hand-picked images.
 
 <p align="center">
   <img src="docs/grid_size_analysis.png" alt="Performance vs Grid Size" width="100%"/>
@@ -18,15 +18,17 @@ A benchmark for testing multimodal LLM spatial reasoning capabilities through it
 | Grid | Pieces | GPT-5.2 | Gemini 3 Pro | Claude Opus 4.5 |
 |------|--------|---------|--------------|-----------------|
 | 3×3  | 9      | **95%** solve, 97% acc | 85% solve, 93% acc | 20% solve, 47% acc |
-| 4×4  | 16     | **40%** solve, 77% acc | 25% solve, 72% acc | — |
-| 5×5  | 25     | 0% solve, 46% acc | **10%** solve, 49% acc | — |
+| 4×4  | 16     | **40%** solve, 77% acc | 25% solve, 72% acc | - |
+| 5×5  | 25     | 0% solve, 46% acc | **10%** solve, 49% acc | - |
+
+*Solve = fully completed puzzles. Acc = % of pieces in correct position.*
 
 **Key insights:**
-- 🔴 **Difficulty scales steeply** — solve rates crash from 95% to 0% between 3×3 and 5×5
-- 🔴 **No model reliably solves 5×5** — spatial reasoning hits a wall at 25 pieces  
-- 🟡 **Partial progress is common** — models often hit a wall at 50-80% correct for 4x4 and 5x5
+- 🔴 **Difficulty scales steeply** - solve rates crash from 95% to 0% between 3×3 and 5×5
+- 🔴 **No model reliably solves 5×5** - spatial reasoning hits a wall at 25 pieces  
+- 🟡 **Partial progress is common** - models often hit a wall at 50-80% piece accuracy for 4x4 and 5x5
 
-*GPT-5.2 and Gemini 3 Pro tested with `low` reasoning effort; Claude Opus 4.5 with `high`.*
+*GPT-5.2 and Gemini 3 Pro tested with `low` reasoning effort; Claude Opus 4.5 with `high`. Higher reasoning showed slightly better performance on individual images, but both GPT-5.2 and Gemini 3 Pro would still get stuck at around 50-80% piece accuracy on average.*
 
 📊 **[Detailed benchmark results →](docs/RESULTS.md)**
 

@@ -214,7 +214,7 @@ class PuzzleGame:
             correct_count=correct_before if self.config.show_correct_count else None,
             total_pieces=self.processor.total_pieces,
             has_reference_image=self.config.show_reference_image,
-            current_turn=self.turn_number + 1,
+            current_turn=self.turn_number,
             max_turns=self.config.max_turns,
         )
 
