@@ -2,6 +2,8 @@
 
 A benchmark for testing multimodal LLM spatial reasoning capabilities through iterative jigsaw puzzle solving.
 
+🎮 **[→ **Try it yourself**](https://llm-jigsaw.streamlit.app/)** - The puzzle that challenges frontier VLMs
+
 <p align="center">
   <img src="docs/reference.png" alt="Reference Image" width="400"/>
   <img src="docs/game_evolution.gif" alt="Solving Process" width="400"/>
@@ -30,7 +32,7 @@ A benchmark for testing multimodal LLM spatial reasoning capabilities through it
 
 *GPT-5.2 and Gemini 3 Pro tested with `low` reasoning effort; Claude Opus 4.5 with `high`. Higher reasoning showed slightly better performance on individual images, but both GPT-5.2 and Gemini 3 Pro would still get stuck at around 50-80% piece accuracy on average.*
 
-📊 **[Detailed benchmark results →](docs/RESULTS.md)**
+📊 **[Detailed benchmark results](docs/RESULTS.md)**
 
 ---
 
@@ -80,7 +82,7 @@ export ANTHROPIC_API_KEY="your-key-here"
 python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model openai/gpt-5.2
 ```
 
-📖 **[Full usage guide & CLI reference →](docs/USAGE.md)**
+📖 **[Full usage guide & CLI reference](docs/USAGE.md)**
 
 ## How It Works
 
