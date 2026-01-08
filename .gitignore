@@ -45,3 +45,6 @@ benchmark_*/
 # __pycache__ directories
 __pycache__/
 plots/
+
+# MkDocs build output
+site/

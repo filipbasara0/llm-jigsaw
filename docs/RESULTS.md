@@ -11,7 +11,7 @@ Comprehensive benchmark results testing frontier multimodal LLMs on jigsaw puzzl
 | 4×4       | 16     | 76.9%            | 40%                | 71.9%                 | 25%                     |
 | 5×5       | 25     | 46.4%            | 0%                 | 49.2%                 | 10%                     |
 
-*Results averaged across 20 images per model per grid size. Claude Opus 4.5 tested only on 3×3 (20% solve rate, 47.2% piece accuracy). Gemini-3.0 Pro and GPT-5.2 were using low reasoning effort, while Opus 4.5 was using high reasoning effort.*
+*Results averaged across 20 images per model per grid size. All models received the **reference image**, **correct piece count**, and **last 3 moves** as context. Claude Opus 4.5 tested only on 3×3 (20% solve rate, 47.2% piece accuracy). Gemini-3.0 Pro and GPT-5.2 were using low reasoning effort, while Opus 4.5 was using high reasoning effort.*
 
 ## Performance vs Puzzle Complexity
 
@@ -62,11 +62,11 @@ Comprehensive benchmark results testing frontier multimodal LLMs on jigsaw puzzl
 - **Images**: 20 diverse test images (landscapes, portraits, abstract art, photos)
 - **Seed**: Fixed seed (42) for reproducible shuffling
 - **Max turns**: 12 turns for 3×3, 17 turns for 4x4, 20 turns for 5x5
-- **Hints enabled**: Correct count shown, reference image provided
+- **Hints enabled**: **Reference image**, **correct count**, **last 3 moves**
 - **Image size**: Resized to 512px shortest side
-- **Reasoning effort**: GPT-5.2 and Gemini 3 Pro used `low` reasoning effort; Claude Opus 4.5 used `high` reasoning effort. Neither can solve puzzles without reasoning even for 3x3 grid sizes. That said, using higher reasoning resulted in only slightly better results on average.
+- **Reasoning effort**: GPT-5.2 and Gemini 3 Pro used `low` reasoning effort; Claude Opus 4.5 used `high` reasoning effort. Neither can solve puzzles without reasoning even for 3x3 grid sizes. That said, using higher reasoning resulted in only slightly better results on average 5x5 grid sizes.
 
-> **Note on reasoning effort**: Informal testing with `high` reasoning effort for GPT-5.2 and Gemini 3 Pro showed slightly better performance (up to ~10%), but at significantly higher cost (a single puzzle could consume ~1M tokens with Gemini) and much longer solving times. Requests would quite often time out for `medium` or `high` reasoning for gpt-5.2. Both GPT and Gemini would still be stuck at ~50%-80% piece accuracy on average. We opted for `low` reasoning to keep the benchmark practical.
+> **Note on reasoning effort**: Informal testing with `high` reasoning effort for GPT-5.2 and Gemini 3 Pro showed slightly better performance (up to ~10%), but at significantly higher cost (a single puzzle could consume ~1M tokens with Gemini) and much longer solving times. Requests would quite often time out for `medium` or `high` reasoning for gpt-5.2. Both GPT and Gemini would still be stuck at ~50%-70% piece accuracy on average for 5x5 grids. We opted for `low` reasoning to keep the benchmark practical.
 
 ## Reproducing Results
 

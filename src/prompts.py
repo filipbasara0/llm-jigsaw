@@ -71,7 +71,7 @@ def build_user_prompt(
     correct_count: Optional[int] = None,
     total_pieces: Optional[int] = None,
     has_reference_image: bool = False,
-    max_history_turns: int = 2,
+    max_history_turns: int = 3,
     current_turn: Optional[int] = None,
     max_turns: Optional[int] = None,
 ) -> str:

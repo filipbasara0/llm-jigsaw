@@ -1,21 +1,26 @@
-# [LLM Jigsaw Puzzle Solver](https://filipbasara0.github.io/llm-jigsaw/)
+# LLM Jigsaw Puzzle Benchmark
 
-A benchmark for testing multimodal LLM spatial reasoning capabilities through iterative jigsaw puzzle solving.
-
-🎮 **[→ **Try it yourself**](https://llm-jigsaw.streamlit.app/)** - The puzzle that challenges frontier VLMs
+<p align="center" style="font-size: 1.25em; margin-bottom: 1em;">
+  <strong>A benchmark for testing multimodal LLM spatial reasoning capabilities through iterative jigsaw puzzle solving.</strong>
+</p>
 
 <p align="center">
-  <img src="docs/reference.png" alt="Reference Image" width="400"/>
-  <img src="docs/game_evolution.gif" alt="Solving Process" width="400"/>
+  <a href="https://llm-jigsaw.streamlit.app/" class="md-button md-button--primary">🎮 Try It Yourself</a>
+  <a href="results/" class="md-button">📊 View Results</a>
 </p>
+
+<div class="hero-images" markdown>
+![Reference Image](assets/reference.png)
+![Solving Process](assets/game_evolution.gif)
+</div>
+
+---
 
 ## 🏆 Benchmark Results
 
 **Can frontier LLMs solve jigsaw puzzles?** We tested GPT-5.2, Gemini 3 Pro, and Claude Opus 4.5 across grid sizes from 3×3 to 5×5 on 20 hand-picked images.
 
-<p align="center">
-  <img src="docs/grid_size_analysis.png" alt="Performance vs Grid Size" width="100%"/>
-</p>
+![Performance vs Grid Size](assets/grid_size_analysis.png)
 
 | Grid | Pieces | GPT-5.2 | Gemini 3 Pro | Claude Opus 4.5 |
 |------|--------|---------|--------------|-----------------|
@@ -23,18 +28,24 @@ A benchmark for testing multimodal LLM spatial reasoning capabilities through it
 | 4×4  | 16     | **40%** solve, 77% acc | 25% solve, 72% acc | - |
 | 5×5  | 25     | 0% solve, 46% acc | **10%** solve, 49% acc | - |
 
-*Solve = fully completed puzzles. Acc = % of pieces in correct position.*
+<p align="center"><em>Solve = fully completed puzzles. Acc = % of pieces in correct position.</em></p>
 
-**Key insights:**
-- 🔴 **Difficulty scales steeply** - solve rates crash from 95% to 0% between 3×3 and 5×5
-- 🔴 **No model reliably solves 5×5** - spatial reasoning hits a wall at 25 pieces  
-- 🟡 **Partial progress is common** - models often hit a wall at 50-80% piece accuracy for 4x4 and 5x5
+### Key Insights
 
-*GPT-5.2 and Gemini 3 Pro tested with `low` reasoning effort; Claude Opus 4.5 with `high`. Higher reasoning showed slightly better performance on individual images, but both GPT-5.2 and Gemini 3 Pro would still get stuck at around 50-70% piece accuracy on average for 5x5 grid sizes.*
+!!! warning "Difficulty scales steeply"
+    Solve rates crash from 95% to 0% between 3×3 and 5×5
+
+!!! failure "No model reliably solves 5×5"
+    Spatial reasoning hits a wall at 25 pieces
+
+!!! info "Partial progress is common"
+    Models often hit a wall at 50-80% piece accuracy for 4×4 and 5×5
+
+*GPT-5.2 and Gemini 3 Pro tested with `low` reasoning effort; Claude Opus 4.5 with `high`. Higher reasoning showed slightly better performance on individual images, but both GPT-5.2 and Gemini 3 Pro would still get stuck at around 50-70% piece accuracy on average for 5x5 grids.*
 
 *All models received the **reference image**, **correct piece count**, and **last 3 moves** as context.*
 
-📊 **[Detailed benchmark results](docs/RESULTS.md)**
+[📊 Detailed benchmark results](results.md){ .md-button }
 
 ---
 
@@ -42,22 +53,43 @@ A benchmark for testing multimodal LLM spatial reasoning capabilities through it
 
 This project shuffles an image into an N×N grid and challenges an LLM to restore the original image by iteratively swapping pieces. The task tests:
 
-- **Visual understanding**: Recognizing piece content and how pieces fit together
-- **Spatial reasoning**: Understanding grid coordinates and piece relationships
-- **Iterative problem solving**: Making progress across multiple turns
-- **Memory/context**: Tracking previous moves and learning from them
+<div class="grid cards" markdown>
+
+- :eye: **Visual Understanding**
+  
+    Recognizing piece content and how pieces fit together
+
+- :brain: **Spatial Reasoning**
+  
+    Understanding grid coordinates and piece relationships
+
+- :arrows_counterclockwise: **Iterative Problem Solving**
+  
+    Making progress across multiple turns
+
+- :brain: **Memory & Context**
+  
+    Tracking previous moves and learning from them
+
+</div>
+
+---
 
 ## Features
 
-- **Configurable difficulty**: Square (4×4) or rectangular (3×5) grids
-- **Multiple LLM providers**: OpenAI, Anthropic, Google
-- **Visual annotations**: Grid labels, colored borders for easy piece identification
-- **Comprehensive metrics**: Tracks moves, accuracy, tokens, timing
-- **Reproducible**: Seed-based shuffling for consistent benchmarks
-- **Optional hints**: Show correct count, provide reference image
-- **Animated GIF output**: Visualize the solving process
+- **Configurable difficulty** – Square (4×4) or rectangular (3×5) grids
+- **Multiple LLM providers** – OpenAI, Anthropic, Google
+- **Visual annotations** – Grid labels, colored borders for easy piece identification
+- **Comprehensive metrics** – Tracks moves, accuracy, tokens, timing
+- **Reproducible** – Seed-based shuffling for consistent benchmarks
+- **Optional hints** – Show correct count, provide reference image
+- **Animated GIF output** – Visualize the solving process
 
-## Installation
+---
+
+## Quick Start
+
+### Installation
 
 ```bash
 # Clone the repository
@@ -72,23 +104,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Quick Start
+### Run a Puzzle
 
 ```bash
 # Set your API key
 export OPENAI_API_KEY="your-key-here"
-export GOOGLE_API_KEY="your-key-here"
-export ANTHROPIC_API_KEY="your-key-here"
 
 # Run a simple puzzle
 python main.py --image images/sample.jpg --resize 512 --grid-size 3 --model openai/gpt-5.2
 ```
 
-📖 **[Full CLI reference](docs/USAGE.md)** · **[Benchmark guide](docs/BENCHMARK.md)**
-
-## Running Benchmarks
-
-Test multiple models across many images:
+### Run Benchmarks
 
 ```bash
 python benchmark.py \
@@ -100,7 +126,9 @@ python benchmark.py \
   --parallel
 ```
 
-📊 **[Full benchmark guide](docs/BENCHMARK.md)**
+[📖 Full CLI reference](usage.md){ .md-button } [📊 Benchmark guide](benchmark.md){ .md-button }
+
+---
 
 ## How It Works
 
@@ -118,6 +146,8 @@ The LLM receives the shuffled puzzle image and responds with JSON specifying swa
 
 Coordinates use 1-indexed `"row,col"` format (top-left is `"1,1"`).
 
+---
+
 ## Output
 
 Results are saved to the output directory:
@@ -129,6 +159,8 @@ results/run_name/
 ├── final_state.png   # Puzzle state at end
 └── game.gif          # Animated solving process
 ```
+
+---
 
 ## Project Structure
 
@@ -142,17 +174,14 @@ llm-jigsaw/
 │   ├── game.py               # Game controller
 │   └── prompts.py            # Prompt templates
 ├── streamlit_app/            # Human player web app
-│   ├── app.py                # Streamlit app
-│   └── requirements_app.txt  # App dependencies
 ├── docs/                     # Documentation
-│   ├── RESULTS.md            # Benchmark results
-│   ├── BENCHMARK.md          # Benchmark guide
-│   └── USAGE.md              # CLI usage guide
 ├── tests/                    # Test suite
 ├── images/                   # Test images
 ├── main.py                   # CLI entry point
 └── benchmark.py              # Benchmark runner
 ```
+
+---
 
 ## License
 

@@ -1,0 +1,156 @@
+/* Hero section styling */
+.md-content h1:first-child {
+  font-size: 2.5em;
+  text-align: center;
+  margin-bottom: 0.5em;
+}
+
+/* Button styling */
+.md-button {
+  margin: 0.25em;
+}
+
+/* Hide left sidebar completely */
+.md-sidebar--primary {
+  display: none;
+}
+
+/* Expand content to use the freed space */
+.md-content {
+  margin-left: 0;
+}
+
+/* Center tables */
+.md-typeset table {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: auto !important;
+  max-width: 100%;
+}
+
+/* Center table container */
+.md-typeset__table {
+  display: flex;
+  justify-content: center;
+}
+
+/* Hero images - side by side */
+.hero-images {
+  margin: 1.5rem 0;
+}
+
+.hero-images p {
+  display: flex !important;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.hero-images a {
+  flex: 1 1 48%;
+  min-width: 300px;
+}
+
+.hero-images img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Center images in paragraphs */
+p img {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Make benchmark charts larger - break out of container */
+.md-content__inner > p > img[alt*="Performance"],
+.md-content__inner > p > img[alt*="Grid Size"],
+figure img[alt*="Performance"],
+figure img[alt*="Grid Size"] {
+  max-width: none !important;
+  width: calc(100% + 4rem) !important;
+  margin-left: -2rem !important;
+  margin-right: -2rem !important;
+}
+
+/* On larger screens, make charts even bigger */
+@media (min-width: 1220px) {
+  .md-content__inner > p > img[alt*="Performance"],
+  .md-content__inner > p > img[alt*="Grid Size"],
+  figure img[alt*="Performance"],
+  figure img[alt*="Grid Size"] {
+    width: calc(100% + 10rem) !important;
+    margin-left: -5rem !important;
+    margin-right: -5rem !important;
+  }
+}
+
+/* Clickable images with zoom cursor */
+.md-content img {
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.md-content img:hover {
+  opacity: 0.95;
+}
+
+/* Table improvements */
+.md-typeset table:not([class]) {
+  font-size: 0.85em;
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* Cards grid */
+.grid.cards > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1em;
+  list-style: none;
+  padding: 0;
+}
+
+.grid.cards > ul > li {
+  background: var(--md-code-bg-color);
+  border-radius: 0.5em;
+  padding: 1em;
+  border-left: 4px solid var(--md-primary-fg-color);
+}
+
+/* Responsive images side by side */
+@media (min-width: 768px) {
+  p:has(img + img) {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    flex-wrap: wrap;
+  }
+  
+  p:has(img + img) img {
+    max-width: 45%;
+  }
+}
+
+/* Admonition customization */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: var(--md-accent-fg-color);
+}
+
+/* Code block styling */
+.md-typeset pre > code {
+  font-size: 0.85em;
+}
+
+/* Footer */
+.md-footer {
+  margin-top: 2em;
+}

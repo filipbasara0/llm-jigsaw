@@ -1,0 +1,77 @@
+site_name: LLM Jigsaw Puzzle Benchmark
+site_description: Testing multimodal LLM spatial reasoning through iterative jigsaw puzzle solving
+site_url: https://filipbasara0.github.io/llm-jigsaw
+repo_url: https://github.com/filipbasara0/llm-jigsaw
+repo_name: llm-jigsaw
+docs_dir: docs_site
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/puzzle-icon.svg
+  favicon: assets/favicon.ico
+
+nav:
+  - Home: index.md
+  - Results: results.md
+  - Usage:
+    - CLI Reference: usage.md
+    - Benchmark Guide: benchmark.md
+  - Try It: https://llm-jigsaw.streamlit.app/
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/filipbasara0/llm-jigsaw
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: true
+
+extra_css:
+  - stylesheets/extra.css
